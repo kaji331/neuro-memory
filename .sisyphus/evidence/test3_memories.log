@@ -1,0 +1,10 @@
+First insert: {
+  id: 1,
+  created: true,
+  reinforced: false,
+}
+Duplicate: {
+  id: 1,
+  created: false,
+  reinforced: true,
+}

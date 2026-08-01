@@ -1,0 +1,19 @@
+{
+  "name": "neuro-memory",
+  "version": "0.1.0",
+  "type": "module",
+  "module": "src/index.ts",
+  "scripts": {
+    "test": "bun test",
+    "start": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/uuid": "^10.0.0",
+    "bun-types": "^1.1.0"
+  }
+}

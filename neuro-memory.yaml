@@ -1,0 +1,73 @@
+# neuro-memory: A persistent memory system for opencode agents
+# This file controls the behaviour of the memory skill.
+# All values shown are defaults. Modify to taste.
+
+# ── Database ──
+db:
+  # Database type: sqlite | postgres | duckdb | mysql | mariadb
+  type: sqlite
+  # Path to SQLite database file (only used when type=sqlite)
+  sqlite_path: "~/.agents/skills/neuro-memory/data/memory.db"
+  # PostgreSQL connection URL (only used when type=postgres)
+  # postgres_url: "postgres://user:pass@localhost:5432/neuro_memory"
+
+# ── Memory Limits ──
+memory:
+  # Maximum number of memory entries before automatic pruning (hard cap)
+  # Range: 100 - 100000
+  max_entries: 5000
+  # Maximum tokens per memory entry (summary only, not full content)
+  # Range: 256 - 4096
+  max_token_per_entry: 1024
+  # Maximum number of top-level categories
+  # Range: 10 - 500
+  max_categories: 50
+  # Maximum subcategories per parent category
+  # Range: 10 - 500
+  max_subcategories_per_category: 100
+  # Maximum categories a subcategory can link to (many-to-many)
+  # Range: 1 - 10
+  max_subcategory_links: 3
+  # Maximum subcategories a single memory can belong to
+  # Range: 1 - 20
+  max_subcategory_per_memory: 10
+
+# ── Memory Retrieval ──
+retrieval:
+  # Minimum relevance score (0.0-1.0) for a memory to be retrieved
+  # Higher = stricter. 0.75 means only fairly relevant memories
+  relevance_threshold: 0.75
+  # Maximum number of memories to retrieve per query (injected into system prompt)
+  # Range: 1 - 10
+  max_results: 3
+  # Timeout in milliseconds for memory retrieval operations
+  # If retrieval takes longer, skip memory injection
+  # Range: 500 - 30000
+  timeout_ms: 3000
+
+# ── Forgetting Curve (Ebbinghaus) ──
+ebbinghaus:
+  # Half-life in hours: how long before a memory's relevance drops to 50%
+  # 24 hours = 1 day. Longer = slower forgetting
+  # Range: 1 - 8760 (1 hour to 1 year)
+  half_life_hours: 24
+  # Minimum relevance threshold for automatic pruning
+  # Memories below this score get deleted during maintenance
+  # Range: 0.0 - 1.0
+  min_relevance: 0.1
+  # Relevance boost applied on each reinforcement (duplicate detected)
+  # Range: 0.0 - 1.0
+  reinforcement_boost: 0.15
+  # How often (in hours) to run automatic maintenance/pruning
+  # Range: 0.1 - 168 (6 minutes to 1 week)
+  prune_interval_hours: 1.0
+
+# ── Summarization / Classification ──
+summarization:
+  # Model to use for summarization subagent
+  # Leave empty to use the same model as the main agent
+  # Example: "gpt-4o-mini", "claude-3-haiku" (if supported)
+  model: ""
+  # Custom prompt template for the summarization subagent
+  # Leave empty to use the built-in default prompt
+  prompt_template: ""
