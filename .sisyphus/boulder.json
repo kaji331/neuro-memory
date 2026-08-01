@@ -2,10 +2,14 @@
   "active_plan": "/home/kaji331/projects/opencode_neuro_mem/.sisyphus/plans/neuro-memory.md",
   "started_at": "2026-08-01T09:17:34.311Z",
   "session_ids": [
-    "ses_04377912fffeFJSI6ZXJa2LQ5D"
+    "ses_04377912fffeFJSI6ZXJa2LQ5D",
+    "ses_0430d0081ffedCCQfQJdIlh0MA",
+    "ses_0430cf10fffebgv733JPH5STBV"
   ],
   "session_origins": {
-    "ses_04377912fffeFJSI6ZXJa2LQ5D": "direct"
+    "ses_04377912fffeFJSI6ZXJa2LQ5D": "direct",
+    "ses_0430d0081ffedCCQfQJdIlh0MA": "appended",
+    "ses_0430cf10fffebgv733JPH5STBV": "appended"
   },
   "plan_name": "neuro-memory",
   "agent": "atlas",
