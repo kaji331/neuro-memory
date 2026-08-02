@@ -1,8 +1,20 @@
 {
   "name": "neuro-memory",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "module": "src/index.ts",
+  "bin": {
+    "neuro-memory": "scripts/neuro-memory-bin.ts"
+  },
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "neuro-memory.yaml",
+    "src",
+    "test",
+    "scripts",
+    "tsconfig.json"
+  ],
   "scripts": {
     "test": "bun test",
     "start": "bun run src/index.ts"
