@@ -16,6 +16,47 @@ IMPORTANT: This skill applies ONLY to conversations with human users. Subagents 
 
 ---
 
+## Memory Commands (User-Triggered)
+
+When the user sends a message starting with `/memories` (or `/memory`), treat it as a memory management command. This is a USER-INITIATED request to inspect the memory database.
+
+CRITICAL — ALWAYS apply these rules when handling any `/memories` command:
+1. Do NOT run memory retrieval (skip the "Memory Retrieval" steps entirely)
+2. Do NOT record this conversation turn (skip the "Memory Recording" steps entirely)
+3. Just run the relevant CLI command and present the output to the user
+4. If the CLI command fails, show the error message to the user plainly — do not invent data
+
+Available commands:
+
+`/memories` or `/memories status` or `/memories stats`
+  → Run: cd ~/.agents/skills/neuro-memory && bun run src/cli.ts status
+  → Display the full status table (total memories, categories, relevance distribution)
+
+`/memories help`
+  → Display this list of available `/memories` subcommands (no CLI call needed)
+
+`/memories query <keyword>` or `/memories search <keyword>`
+  → Run: cd ~/.agents/skills/neuro-memory && bun run src/cli.ts query --keyword "<keyword>" --limit 10 --format table
+  → Display the results table. If empty, say "No memories found for '<keyword>'."
+
+`/memories recent`
+  → Run: cd ~/.agents/skills/neuro-memory && bun run src/cli.ts query --limit 5 --format table
+  → Display the most recent memories
+
+`/memories categories`
+  → Run: cd ~/.agents/skills/neuro-memory && bun run src/cli.ts status
+  → Extract and display the category count and list from the status output
+
+`/memories top`
+  → Run: cd ~/.agents/skills/neuro-memory && bun run src/cli.ts query --relevance 0.8 --limit 5 --format table
+  → Display the highest-relevance memories
+
+For any unrecognized subcommand (e.g. `/memories delete`, `/memories asdf`):
+  → Display the `/memories help` list and ask the user to choose a valid command
+  → Do NOT attempt to guess or run an unknown CLI command
+
+---
+
 ## Memory Retrieval (BEFORE Each Response)
 
 You MUST follow these steps BEFORE every response to a human message.
@@ -23,6 +64,7 @@ You MUST follow these steps BEFORE every response to a human message.
 ### Step 1: Check if retrieval is needed
 
 - If this is the FIRST message in a new session (no prior user messages): SKIP retrieval (nothing to query yet)
+- If the user's message starts with `/memories` or `/memory`: SKIP retrieval (memory management commands — see "Memory Commands" section)
 - If the query is purely about system configuration or memory management (e.g., "show memory", "clear memory", "memory stats"): SKIP retrieval
 - Otherwise: PROCEED to Step 2
 
@@ -97,6 +139,7 @@ You MUST follow these steps AFTER EVERY response you send to a human user.
 ### Step 1: Check if recording is needed
 
 SKIP recording if ANY of these conditions are met:
+- The user's message starts with `/memories` or `/memory`: these are memory management commands, never record them
 - The conversation turn contains ONLY greetings ("hello", "hi", "hey", "你好", "早上好", etc.)
 - The conversation turn contains ONLY farewells ("bye", "goodbye", "再见", "see you", etc.)
 - The conversation turn is purely about agent identity ("who are you", "what can you do", "你是谁")
