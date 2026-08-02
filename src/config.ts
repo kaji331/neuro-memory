@@ -44,6 +44,10 @@ export interface NeuroMemoryConfig {
   retrieval: RetrievalConfig;
   ebbinghaus: EbbinghausConfig;
   summarization: SummarizationConfig;
+  // When true (default), automatic memory retrieval and storage run silently:
+  // memories are still queried and used internally, but nothing is printed to
+  // the user / shown in the agent's visible response.
+  silent: boolean;
 }
 
 // ── Default values ──────────────────────────────────────────────────────────
@@ -76,6 +80,7 @@ const DEFAULT_CONFIG: NeuroMemoryConfig = {
     model: "",
     prompt_template: "",
   },
+  silent: true,
 };
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -233,6 +238,11 @@ export function validateConfig(config: NeuroMemoryConfig): string[] {
     if (typeof config.summarization.prompt_template !== "string") {
       errors.push("summarization.prompt_template must be a string");
     }
+  }
+
+  // ── silent ────────────────────────────────────────────────────────────
+  if (typeof config.silent !== "boolean") {
+    errors.push("silent must be a boolean (true = silent operation, false = visible)");
   }
 
   return errors;

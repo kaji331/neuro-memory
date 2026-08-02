@@ -54,7 +54,7 @@ Usage:
   neuro-memory <command> [options]
 
 Commands:
-  query        Search memories by keyword, category, subcategory, or relevance
+  query        Search memories by keyword, category, subcategory, or relevance (--all lists all, most-recent first)
   insert       Insert a new memory: --content, --from-file, or --conversation-turn
   reinforce    Reinforce memories: --id, --content-hash, or --all
   prune        Delete low-relevance memories (use --dry-run to preview, --force to skip confirm)
@@ -147,10 +147,7 @@ async function cmdQuery(db: DBAdapter, args: string[]): Promise<void> {
   const limitStr = getFlag(args, "--limit");
   const format = getFlag(args, "--format");
 
-  if (!keyword && !category && !subcategory) {
-    console.error("Error: At least one filter flag is required (--keyword, --category, or --subcategory)");
-    process.exit(1);
-  }
+  const all = hasFlag(args, "--all") || (!keyword && !category && !subcategory);
 
   const minRelevance = relevanceStr ? parseFloat(relevanceStr) : undefined;
   const limit = limitStr ? parseInt(limitStr, 10) : undefined;
@@ -246,9 +243,18 @@ async function cmdQuery(db: DBAdapter, args: string[]): Promise<void> {
       keyword,
       subcategoryId,
       minRelevance,
-      limit,
+      limit: all && minRelevance === undefined ? undefined : limit,
     });
     results.push(...mems);
+  }
+
+  // Wordless unfiltered queries present most-recent-first; relevance-filtered
+  // queries keep the adapter's relevance ordering.
+  if (all && minRelevance === undefined) {
+    results.sort((a, b) => b.created_at - a.created_at);
+    if (limit) {
+      results.splice(limit);
+    }
   }
 
   const showReinforcements = hasFlag(args, "--show-reinforcements");

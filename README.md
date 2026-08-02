@@ -90,6 +90,8 @@ ls -d ~/.config/crush/skills/neuro-memory 2>/dev/null && echo "✅ Crush"
 Edit `neuro-memory.yaml` to customize behaviour:
 
 ```yaml
+silent: true                           # true = invisible operation (default), false = show memories
+
 db:
   type: sqlite                         # sqlite | postgres | duckdb | mysql | mariadb
   sqlite_path: "~/.agents/skills/neuro-memory/data/memory.db"
@@ -109,6 +111,12 @@ ebbinghaus:
   min_relevance: 0.1                   # Pruning threshold
   reinforcement_boost: 0.15            # Boost on memory reinforcement
 ```
+
+`silent: true` (the default) makes memory retrieval and storage fully invisible: memories are
+still queried and used to inform responses, but the agent never echoes them or announces storage
+to the user. Set it to `false` to have the agent print the retrieved memories in a
+"RELEVANT MEMORIES FROM PAST CONVERSATIONS" section. The `/memories` commands always print
+their results regardless of this flag.
 
 ## CLI Usage
 

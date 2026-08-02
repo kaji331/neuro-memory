@@ -1,6 +1,6 @@
 ---
 name: neuro-memory
-description: Persistent neuro-memory system — automatically records conversation knowledge and retrieves relevant context before each response.
+description: Persistent neuro-memory system — automatically records conversation knowledge and retrieves relevant context before each response. Runs silently by default (no memory display unless enabled in neuro-memory.yaml).
 ---
 
 # Neuro-Memory Skill
@@ -95,9 +95,17 @@ If the command errors: SKIP memory injection (proceed without memories).
 - If no results or timeout: Proceed normally (this is expected for new topics; the database grows over time)
 - If error: Proceed normally (do not retry; do not report the error to the user)
 
-### Step 4: Inject into context
+### Step 4: Apply results (silent by default)
 
-Add this section near the top of your response, after the user message but before your reasoning:
+The `silent` flag in `neuro-memory.yaml` controls whether retrieved memories are shown to the
+user. It defaults to `true`. Check the config at `~/.agents/skills/neuro-memory/neuro-memory.yaml`
+(or `./neuro-memory.yaml`); if it is missing, treat `silent` as `true`.
+
+- **If `silent: true` (default):** Incorporate the retrieved memories into your internal reasoning
+  to inform your response, but DO NOT print any memory or memory-related section to the user.
+  Do not mention that you retrieved memories. Behave as if you simply knew the information.
+- **If `silent: false`:** Add this visible section near the top of your response, after the user
+  message but before your reasoning:
 
 ```
 ## RELEVANT MEMORIES FROM PAST CONVERSATIONS
@@ -114,15 +122,11 @@ Format each memory as: `[Memory] <summary> | Category: <category> > <subcategory
 
 Common categories include: programming, science, technology, health, food, travel, finance, education, gaming, productivity, etc.
 
-### Examples:
+### Examples (when `silent: true` — the default):
 
-**GOOD (has relevant memories):**
-```
-## RELEVANT MEMORIES FROM PAST CONVERSATIONS
-
-[Memory] User prefers TypeScript over JavaScript for type safety | Relevance: 0.88 | Category: programming > languages
-[Memory] User is working on a memory system for opencode | Relevance: 0.82 | Category: programming > agent-skills
-```
+**GOOD (has relevant memories, silent):**
+Use the memories silently — do not print any memory section. Just answer the user directly,
+using the retrieved information to inform your response.
 
 **GOOD (no relevant memories):**
 (No memory section added. This is fine. Proceed with the response normally.)
@@ -198,3 +202,16 @@ IMPORTANT: You work WITHOUT the neuro-memory skill loaded. Do NOT attempt to ret
 ### Step 3: Confirm execution
 
 After spawning the subagent, do NOT wait for it. Do NOT report its status to the user. Simply proceed to wait for the next user message.
+
+**Silent storage (default):** Never announce that memory is being stored, and never mention the
+background subagent to the user. When `silent: true` (the default), the whole recording pipeline
+is invisible. Even when `silent: false`, still avoid annoying play-by-play announcements; only the
+retrieved-memories section becomes visible.
+
+### Silent Mode Summary
+
+By default (`silent: true` in `neuro-memory.yaml`) the entire system is invisible:
+retrieval populates your context silently, and storage runs silently in the background.
+The `/memories` user commands are the explicit, always-visible exception — invoke them as
+described above with their printed output. There is no behavioral difference in retrieval or
+storage themselves; `silent` only controls what is echoed in the visible response.

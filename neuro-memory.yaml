@@ -2,6 +2,13 @@
 # This file controls the behaviour of the memory skill.
 # All values shown are defaults. Modify to taste.
 
+# ── Agent Behaviour ──
+# silent: when true (default), automatic memory retrieval and storage run
+# silently — memories are still queried and injected into the agent's context,
+# but nothing is echoed in the agent's visible response. Set to false to have
+# the agent print the retrieved memories (and announce storage) to the user.
+silent: true
+
 # ── Database ──
 db:
   # Database type: sqlite | postgres | duckdb | mysql | mariadb

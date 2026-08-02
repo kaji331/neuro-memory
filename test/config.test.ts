@@ -63,6 +63,8 @@ describe("getDefaultConfig", () => {
 
     expect(cfg.summarization.model).toBe("");
     expect(cfg.summarization.prompt_template).toBe("");
+
+    expect(cfg.silent).toBe(true);
   });
 
   it("returns a deep copy, not a shared reference", () => {
@@ -140,6 +142,13 @@ describe("validateConfig", () => {
     delete (cfg as any).db;
     const errors = validateConfig(cfg);
     expect(errors.some((e) => e.includes("db section"))).toBe(true);
+  });
+
+  it("detects non-boolean silent", () => {
+    const cfg = validConfig();
+    (cfg as any).silent = "yes";
+    const errors = validateConfig(cfg);
+    expect(errors.some((e) => e.includes("silent"))).toBe(true);
   });
 });
 
