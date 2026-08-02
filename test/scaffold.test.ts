@@ -23,6 +23,6 @@ describe("neuro-memory scaffold", () => {
   it("should export name and version from src/index.ts", async () => {
     const mod = await import(resolve(root, "src/index.ts"));
     expect(mod.name).toBe("neuro-memory");
-    expect(mod.version).toBe("0.1.0");
+    expect(mod.version).toBe("0.1.1");
   });
 });
