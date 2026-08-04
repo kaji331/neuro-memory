@@ -134,13 +134,17 @@ ln -s "$(pwd)" ~/.agents/skills/neuro-memory
 
 **它怎么运作**：opencode 启动时会扫描 `~/.agents/skills/*/SKILL.md`，并把匹配的技能注入系统提示词。自动的"每次回应前查记忆、回应后记记忆"则由 **opencode 插件**（`plugin/`）静默完成——SKILL.md 只负责用户主动敲入的 `/neuro-memory` 显式命令。
 
-> 🔌 **启用静默插件（一次性）**：插件文件位于 `~/.agents/skills/neuro-memory/plugin/index.ts`（`neuro-memory update` 已自动同步）。opencode 不会自动扫描 skill 目录里的 plugin，需要手动注册一次。在 `opencode.json`（项目 `.opencode/opencode.json` 或全局 `~/.config/opencode/opencode.json`）的 `plugin` 数组加入，或建一个自动发现的插件文件：
+> 🔌 **启用静默插件（一次性）**：插件位于 `~/.agents/skills/neuro-memory/plugin/`（带 `package.json` + `server.ts`，`neuro-memory update` 已自动同步）。opencode 不会自动扫描 skill 目录里的 plugin，需要在全局 `~/.config/opencode/opencode.json` 的 `plugin` 数组加入插件**目录路径**：
 >
-> `.opencode/plugins/neuro-memory.ts`（项目）或 `~/.config/opencode/plugins/neuro-memory.ts`（全局），内容：
-> ```ts
-> export { neuroMemoryPlugin as default } from "~/.agents/skills/neuro-memory/plugin/index";
+> ```json
+> {
+>   "plugin": [
+>     "/home/kaji331/.agents/skills/neuro-memory/plugin"
+>   ]
+> }
 > ```
-> 重启 opencode 后，自动召回与录入即静默生效（默认 `display:false` 完全静默；改 `neuro-memory.yaml` 的 `display:true` 可见）。
+>
+> 重启 opencode 后，自动召回与录入即静默生效（默认 `display:false` 完全静默；改 `neuro-memory.yaml` 的 `display:true` 可见）。插件目录会随 `neuro-memory update` 自动同步；若更改安装路径，请同步更新此处路径。
 
 ### Pi (π)
 

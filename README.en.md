@@ -79,7 +79,7 @@ After each turn, it spawns a **background** sub-agent that:
 | **Ebbinghaus Forgetting Curve** | Memories decay naturally over time; frequently "reinforced" memories last longer (default half-life: 24h) |
 | **5,000-Entry Hard Cap** | Automatically prunes low-relevance old memories at the cap, keeping the store lean |
 
-> 🎁 **Bonus: Silent Mode (on by default).** Memory retrieval and storage run entirely in the "background" — the AI never reveals it queried memory, for a seamless, natural experience. Want it "shown"? Set `silent` to `false` in the config.
+> 🎁 **Bonus: Silent Mode (on by default).** Memory retrieval and storage run entirely in the "background" — handled silently by the opencode plugin (`plugin/`). The AI never reveals it queried memory, and never issues visible tool calls. The experience is seamless and natural. Want it "shown"? Set `display` to `true` in the config.
 
 ---
 
@@ -117,7 +117,19 @@ Drop the skill into opencode's skills directory and it's auto-discovered:
 ln -s "$(pwd)" ~/.agents/skills/neuro-memory
 ```
 
-**How it works**: opencode scans `~/.agents/skills/*/SKILL.md` on startup and injects matching skills into the system prompt. SKILL.md tells the agent to query memory before each response and record after each response.
+**How it works**: opencode scans `~/.agents/skills/*/SKILL.md` on startup and injects matching skills into the system prompt. Automatic "query before each response, record after each response" is handled silently by the **opencode plugin** (`plugin/`) — SKILL.md only covers the explicit `/neuro-memory` command the user types.
+
+> 🔌 **Enable the silent plugin (one-time setup)**: the plugin lives at `~/.agents/skills/neuro-memory/plugin/` (includes `package.json` + `server.ts`, auto-synced by `neuro-memory update`). opencode does NOT auto-scan skill directories for plugins — you must add the plugin **directory path** to the `plugin` array in `~/.config/opencode/opencode.json`:
+>
+> ```json
+> {
+>   "plugin": [
+>     "/home/kaji331/.agents/skills/neuro-memory/plugin"
+>   ]
+> }
+> ```
+>
+> After restarting opencode, automatic retrieval & recording take effect silently (default `display:false` = fully silent; set `display:true` in `neuro-memory.yaml` to see them). The plugin directory is auto-synced on every `neuro-memory update`; if you change the install path, update this path accordingly.
 
 ### Pi (π)
 
@@ -183,18 +195,18 @@ Supported flags:
 
 ## 💬 Using It in Conversation
 
-During a chat, type `/memories` or `/memory` to manage your memories (these commands **always** print their results, regardless of silent mode):
+During a chat, type `/neuro-memory` to manage your memories (these commands **always** print their results — they are the only visible-by-design commands; auto retrieval & recording are handled silently by the plugin):
 
 | Command | Purpose |
 | --- | --- |
-| `/memory status` | Memory store overview (totals, categories, relevance distribution) |
-| `/memory query <keyword>` | Search memories by keyword |
-| `/memory recent` | Show recent memories |
-| `/memory top` | Show highest-relevance memories |
-| `/memory categories` | Show the category list |
-| `/memory help` | Show available commands |
+| `/neuro-memory status` | Memory store overview (totals, categories, relevance distribution) |
+| `/neuro-memory query <keyword>` | Search memories by keyword |
+| `/neuro-memory recent` | Show recent memories |
+| `/neuro-memory top` | Show highest-relevance memories |
+| `/neuro-memory categories` | Show the category list |
+| `/neuro-memory help` | Show available commands |
 
-Unknown subcommands (e.g. `/memory delete`)? It will show the help list rather than guessing and running a nonexistent command. 👍
+Unknown subcommands (e.g. `/neuro-memory delete`)? It will show the help list rather than guessing and running a nonexistent command. 👍
 
 ---
 
@@ -204,7 +216,7 @@ Everything is configured through `neuro-memory.yaml` and takes effect immediatel
 
 ```yaml
 # ── Silent mode (remember that "bonus" from the intro?) ──
-silent: true                    # true = fully silent (default); false = print retrieved "past memories"
+display: false                 # false = fully silent (default, plugin handles retrieval/recording silently); true = print retrieved "past memories"
 
 # ── Database ──
 db:

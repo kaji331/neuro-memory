@@ -1,3 +1,18 @@
+/**
+ * neuro-memory opencode plugin.
+ *
+ * Enable in opencode.json: add the path to this plugin/ directory to the "plugin" array.
+ * Example:
+ *   { "plugin": ["/home/kaji331/.agents/skills/neuro-memory/plugin"] }
+ *
+ * The plugin directory contains a package.json whose default export (server.ts)
+ * provides { id: "neuro-memory", server: neuroMemoryPlugin } — the format opencode
+ * v1.18.12 expects for local directory entries in the plugin array.
+ *
+ * Default display:false = fully silent retrieval & recording.
+ * Set display:true in neuro-memory.yaml to surface retrieved memories in chat.
+ * The plugin directory is auto-synced by the "neuro-memory update" bunx command.
+ */
 import { resolve, dirname } from "path";
 import { homedir } from "os";
 import { mkdirSync, appendFileSync, existsSync } from "fs";

@@ -1,0 +1,11 @@
+{
+  "name": "neuro-memory-plugin",
+  "private": true,
+  "version": "0.1.1",
+  "type": "module",
+  "exports": {
+    "./server": "./server.ts",
+    "./index": "./index.ts"
+  },
+  "main": "./server.ts"
+}
