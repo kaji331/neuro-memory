@@ -3,11 +3,15 @@
 # All values shown are defaults. Modify to taste.
 
 # ── Agent Behaviour ──
-# silent: when true (default), automatic memory retrieval and storage run
-# silently — memories are still queried and injected into the agent's context,
-# but nothing is echoed in the agent's visible response. Set to false to have
-# the agent print the retrieved memories (and announce storage) to the user.
-silent: true
+# display: when true, automatic memory retrieval and storage become VISIBLE —
+# the agent prints retrieved memories and announces storage to the user.
+# When false (default), the plugin runs FULLY SILENT: memories are still queried
+# and injected into the agent's context, but nothing is echoed at the
+# user-conversation level.
+# Back-compat: if the legacy `silent` key is present, `display` wins when set;
+# otherwise `display = !silent`. When neither key is present, display=false.
+display: false
+# silent: true   # (legacy alias, kept for backwards compatibility)
 
 # ── Database ──
 db:
@@ -15,6 +19,10 @@ db:
   type: sqlite
   # Path to SQLite database file (only used when type=sqlite)
   sqlite_path: "~/.agents/skills/neuro-memory/data/memory.db"
+  # Override for a SHARED SQLite database (opencode plugin). Relative paths are
+  # resolved inside ~/.config/opencode/neuro-memory/; paths escaping that base
+  # directory are rejected. Leave unset to use the default dbPath.
+  # memory_db_path: "shared/memory.db"
   # PostgreSQL connection URL (only used when type=postgres)
   # postgres_url: "postgres://user:pass@localhost:5432/neuro_memory"
 
