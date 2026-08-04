@@ -18,7 +18,7 @@ const PKG_NAME = "neuro-memory";
 const DEFAULT_TARGET = join(homedir(), ".agents", "skills", "neuro-memory");
 
 const SRC_FILES = ["SKILL.md", "README.md", "neuro-memory.yaml", "package.json", "tsconfig.json", "bun.lock"];
-const SRC_DIRS = ["src", "test"];
+const SRC_DIRS = ["src", "test", "plugin"];
 
 const SKIP = new Set([".git", "node_modules", "data", ".sisyphus", "dist", "scripts"]);
 
