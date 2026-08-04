@@ -79,7 +79,22 @@
 | **艾宾浩斯遗忘曲线** | 记忆随时间自然衰减；越常被"强化"的记忆留存越久（默认半衰期 24 小时） |
 | **5000 条硬上限** | 达到上限自动剪枝低相关度的旧记忆，保持记忆库永远"精炼" |
 
-> 🎁 **彩蛋：静默模式（默认开启）**。记忆的召回与存储全程在"后台"运行，AI 不会在回复里透露出它查了记忆——体验无缝而自然。想让它"亮出来"给你看？把配置里的 `silent` 改成 `false` 即可。
+> 🎁 **彩蛋：静默模式（默认开启）**。记忆的召回与存储全程在"后台"运行——由 opencode 插件（`plugin/`）静默处理，AI 不会在回复里透露出它查了记忆，也不会发起任何可见的工具调用。体验无缝而自然。想让它"亮出来"给你看？把配置里的 `display` 改成 `true` 即可。
+
+> 🔧 **Pi (π) 尽力而为方案**：Pi (oh-my-pi) **没有 turn-boundary hook**（无法检测每轮对话结束、无法在每轮开始前静默注入记忆上下文），因此 neuro-memory 在 Pi 上**不能做到 opencode 那样的全静默一体化体验**。但以下两种途径仍然有效：
+>
+> 1. **显式命令** `/neuro-memory` — Pi 读取 SKILL.md 后自动识别该命令，status/query/recent/categories/top/help 全部可用。这是用户主动触发的、设计上可见的操作。
+> 2. **会话启动时注入记忆**（recipe）：Pi 支持 `--append-system-prompt <文件>` 标志，可以在启动会话前生成记忆摘要文件并注入系统提示词：
+>
+>    ```bash
+>    # 生成上下文并启动 Pi
+>    bun run src/cli.ts query --all --limit 5 > /tmp/neuro_memory_context.md
+>    omp --append-system-prompt /tmp/neuro_memory_context.md
+>    ```
+>
+>    这将最近的记忆摘要**静默注入**到系统提示词（不可见），但仅在会话开始时生效一次，**不会在每轮对话中动态更新**。
+>
+> > 💡 **推荐**：需要全静默体验时，使用 opencode。Pi 上 neuro-memory 的显式命令和启动注入方案足以覆盖多数场景。
 
 ---
 
@@ -117,7 +132,7 @@ bun test
 ln -s "$(pwd)" ~/.agents/skills/neuro-memory
 ```
 
-**它怎么运作**：opencode 启动时会扫描 `~/.agents/skills/*/SKILL.md`，并把匹配的技能注入系统提示词。SKILL.md 则告诉智能体：每次回应前查记忆、回应后记记忆。
+**它怎么运作**：opencode 启动时会扫描 `~/.agents/skills/*/SKILL.md`，并把匹配的技能注入系统提示词。自动的"每次回应前查记忆、回应后记记忆"则由 **opencode 插件**（`plugin/`）静默完成——SKILL.md 只负责用户主动敲入的 `/neuro-memory` 显式命令。
 
 ### Pi (π)
 
@@ -128,6 +143,8 @@ ln -s ~/.agents/skills/neuro-memory ~/.pi/agent/skills/neuro-memory
 ```
 
 > 已经链过了？验证一下：`ls -la ~/.pi/agent/skills/neuro-memory`
+
+**它怎么运作**：Pi 读取 SKILL.md 后会识别 `/neuro-memory` 命令。自动的"每轮全静默"召回/记录依赖 opencode 插件机制（Pi 没有 turn-boundary hook），因此在 Pi 上只能通过显式命令或会话启动前注入记忆上下文（见上方 ⚠️ 说明）。推荐 opencode 来获得全静默体验。
 
 ### Claude Code
 
@@ -183,18 +200,18 @@ bunx --bun -p "github:kaji331/neuro-memory" neuro-memory update --dry-run
 
 ## 💬 和 AI 对话时怎么用
 
-在聊天中，你可以直接敲入 `/memories` 或 `/memory` 来管理记忆（这些命令总会**打印**结果，不受静默模式影响）：
+在聊天中，你可以直接敲入 `/neuro-memory` 来管理记忆（这些命令总会**打印**结果，是唯一显式的、按设计可见的命令；自动召回与记录由插件静默完成）：
 
 | 命令 | 作用 |
 | --- | --- |
-| `/memory status` | 查看记忆库总览（总数、分类、相关度分布） |
-| `/memory query <关键词>` | 按关键词搜索记忆 |
-| `/memory recent` | 查看最近的记忆 |
-| `/memory top` | 查看相关度最高的记忆 |
-| `/memory categories` | 查看分类清单 |
-| `/memory help` | 显示可用命令列表 |
+| `/neuro-memory status` | 查看记忆库总览（总数、分类、相关度分布） |
+| `/neuro-memory query <关键词>` | 按关键词搜索记忆 |
+| `/neuro-memory recent` | 查看最近的记忆 |
+| `/neuro-memory top` | 查看相关度最高的记忆 |
+| `/neuro-memory categories` | 查看分类清单 |
+| `/neuro-memory help` | 显示可用命令列表 |
 
-遇到未知子命令（比如 `/memory delete`）？它会显示帮助列表，而**不会**去猜测执行一个不存在的命令。👍
+遇到未知子命令（比如 `/neuro-memory delete`）？它会显示帮助列表，而**不会**去猜测执行一个不存在的命令。👍
 
 ---
 
@@ -204,7 +221,7 @@ bunx --bun -p "github:kaji331/neuro-memory" neuro-memory update --dry-run
 
 ```yaml
 # ── 静默模式（还记得开场那个"彩蛋"吗）──
-silent: true                    # true = 完全静默（默认）；false = 打印召回的"历史记忆"
+display: false                 # false = 完全静默（默认，由插件静默召回/记录）；true = 打印召回的"历史记忆"
 
 # ── 数据库 ──
 db:
