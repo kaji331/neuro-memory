@@ -12,6 +12,7 @@
  *   status       Show system status overview
  *   maintenance  Run full maintenance routine (recalculate → prune → orphan cleanup)
  *   validate     Validate config file or show defaults
+ *   summarize    Summarize a conversation turn and optionally store as memory
  *   --help       Show this help message
  *   --version    Show version
  *
@@ -24,6 +25,7 @@
 import { createAdapter, type DBAdapter } from "./db/adapter";
 import { loadConfig, getDefaultConfig, configToYaml, validateConfig } from "./config";
 import { computeContentHash } from "./hash";
+import { summarizeTurn } from "./summarize";
 import type { NeuroMemoryConfig } from "./config";
 
 // ── Version ───────────────────────────────────────────────────────────────────
@@ -57,6 +59,7 @@ Commands:
   query        Search memories by keyword, category, subcategory, or relevance (--all lists all, most-recent first)
   insert       Insert a new memory: --content, --from-file, or --conversation-turn
   reinforce    Reinforce memories: --id, --content-hash, or --all
+  summarize    Summarize a conversation turn: --input-file <path> or --conversation-turn <text> [--max-tokens <n>]
   prune        Delete low-relevance memories (use --dry-run to preview, --force to skip confirm)
   status       Show memory system overview
   maintenance  Run full maintenance: recalculate → prune → orphan cleanup
@@ -644,6 +647,46 @@ async function cmdValidate(args: string[], config: NeuroMemoryConfig): Promise<v
   console.log("Config valid.");
 }
 
+// ── Summarize ────────────────────────────────────────────────────────────────
+
+async function cmdSummarize(db: DBAdapter, args: string[], config: NeuroMemoryConfig): Promise<void> {
+  const inputFile = getFlag(args, "--input-file");
+  const conversationTurn = getFlag(args, "--conversation-turn");
+  const maxTokensStr = getFlag(args, "--max-tokens");
+
+  let turnText: string;
+
+  if (inputFile) {
+    const { existsSync, readFileSync } = await import("fs");
+    if (!existsSync(inputFile)) {
+      console.error(`Error: File not found: ${inputFile}`);
+      process.exit(1);
+    }
+    try {
+      turnText = readFileSync(inputFile, "utf-8");
+    } catch (err) {
+      console.error(`Error reading file: ${(err as Error).message}`);
+      process.exit(1);
+    }
+  } else if (conversationTurn) {
+    turnText = conversationTurn;
+  } else {
+    console.error("Error: One of --input-file or --conversation-turn must be specified");
+    process.exit(1);
+  }
+
+  const maxTokens = maxTokensStr ? parseInt(maxTokensStr, 10) : 8000;
+  if (maxTokensStr !== undefined && (isNaN(maxTokens) || maxTokens < 1)) {
+    console.error("Error: --max-tokens must be a positive integer");
+    process.exit(1);
+  }
+
+  const result = await summarizeTurn(db, config, { turn: turnText, maxTokens });
+
+  // Output as parseable JSON
+  console.log(JSON.stringify(result));
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -698,6 +741,9 @@ async function main(): Promise<void> {
         break;
       case "validate":
         await cmdValidate(args, config);
+        break;
+      case "summarize":
+        await cmdSummarize(db, args, config);
         break;
       default:
         console.error(`Unknown command: ${command}`);
