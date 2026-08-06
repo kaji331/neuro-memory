@@ -18,7 +18,10 @@ const PKG_NAME = "neuro-memory";
 const DEFAULT_TARGET = join(homedir(), ".agents", "skills", "neuro-memory");
 
 const SRC_FILES = ["SKILL.md", "README.md", "neuro-memory.yaml", "package.json", "tsconfig.json", "bun.lock"];
-const SRC_DIRS = ["src", "test", "plugin"];
+const SRC_DIRS = ["src", "test", "opencode-neuro-memory-plugin"];
+
+const CRUSH_SRC = join("crush", "commands", "neuro-memory.md");
+const CRUSH_DEST_DIR = join(homedir(), ".config", "crush", "commands");
 
 const SKIP = new Set([".git", "node_modules", "data", ".sisyphus", "dist", "scripts"]);
 
@@ -89,6 +92,11 @@ function main(): void {
     console.log(`  files: ${SRC_FILES.join(", ")}`);
     console.log(`  dirs:  ${SRC_DIRS.join(", ")}`);
     console.log("  preserve: target/data/** (memory database is never overwritten)");
+    const crushSrc = join(source, CRUSH_SRC);
+    if (existsSync(crushSrc)) {
+      console.log(`  crush command: ${crushSrc}`);
+      console.log(`              -> ${join(CRUSH_DEST_DIR, "neuro-memory.md")}`);
+    }
     return;
   }
 
@@ -105,6 +113,19 @@ function main(): void {
   const stats = { files: 0 };
   for (const d of SRC_DIRS) {
     copyDir(join(source, d), join(target, d), stats);
+  }
+
+  // Sync the crush custom command, but never clobber an existing user file.
+  const crushSrc = join(source, CRUSH_SRC);
+  const crushDest = join(CRUSH_DEST_DIR, "neuro-memory.md");
+  if (existsSync(crushSrc)) {
+    if (existsSync(crushDest)) {
+      console.log(`Note: crush command already exists, leaving untouched: ${crushDest}`);
+    } else {
+      mkdirSync(CRUSH_DEST_DIR, { recursive: true });
+      copyFileSync(crushSrc, crushDest);
+      console.log(`Copied crush command -> ${crushDest}`);
+    }
   }
 
   console.log(`Updated ${PKG_NAME} skill -> ${target}`);
