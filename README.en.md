@@ -79,7 +79,7 @@ After each turn, it spawns a **background** sub-agent that:
 | **Ebbinghaus Forgetting Curve** | Memories decay naturally over time; frequently "reinforced" memories last longer (default half-life: 24h) |
 | **5,000-Entry Hard Cap** | Automatically prunes low-relevance old memories at the cap, keeping the store lean |
 
-> 🎁 **Bonus: Silent Mode (on by default).** Memory retrieval and storage run entirely in the "background" — handled silently by the opencode plugin (`plugin/`). The AI never reveals it queried memory, and never issues visible tool calls. The experience is seamless and natural. Want it "shown"? Set `display` to `true` in the config.
+> 🎁 **Bonus: Silent Mode (on by default).** Memory retrieval and storage run entirely in the "background" — handled silently by the opencode plugin (`opencode-neuro-memory-plugin/`). The AI never reveals it queried memory, and never issues visible tool calls. The experience is seamless and natural. Want it "shown"? Set `display` to `true` in the config.
 
 ---
 
@@ -117,14 +117,14 @@ Drop the skill into opencode's skills directory and it's auto-discovered:
 ln -s "$(pwd)" ~/.agents/skills/neuro-memory
 ```
 
-**How it works**: opencode scans `~/.agents/skills/*/SKILL.md` on startup and injects matching skills into the system prompt. Automatic "query before each response, record after each response" is handled silently by the **opencode plugin** (`plugin/`) — SKILL.md only covers the explicit `/neuro-memory` command the user types.
+**How it works**: opencode scans `~/.agents/skills/*/SKILL.md` on startup and injects matching skills into the system prompt. Automatic "query before each response, record after each response" is handled silently by the **opencode plugin** (`opencode-neuro-memory-plugin/`) — SKILL.md only covers the explicit `/neuro-memory` command the user types.
 
-> 🔌 **Enable the silent plugin (one-time setup)**: the plugin lives at `~/.agents/skills/neuro-memory/plugin/` (includes `package.json` + `server.ts`, auto-synced by `neuro-memory update`). opencode does NOT auto-scan skill directories for plugins — you must add the plugin **directory path** to the `plugin` array in `~/.config/opencode/opencode.json`:
+> 🔌 **Enable the silent plugin (one-time setup)**: the plugin lives at `~/.agents/skills/neuro-memory/opencode-neuro-memory-plugin/` (includes `package.json` + `server.ts`, auto-synced by `neuro-memory update`). opencode does NOT auto-scan skill directories for plugins — you must add the plugin **directory path** to the `plugin` array in `~/.config/opencode/opencode.json`:
 >
 > ```json
 > {
 >   "plugin": [
->     "/home/kaji331/.agents/skills/neuro-memory/plugin"
+>     "/home/kaji331/.agents/skills/neuro-memory/opencode-neuro-memory-plugin"
 >   ]
 > }
 > ```
@@ -157,6 +157,13 @@ Crush loads skills from `~/.config/crush/skills/` (also a symlink farm):
 mkdir -p ~/.config/crush/skills
 ln -s ~/.agents/skills/neuro-memory ~/.config/crush/skills/neuro-memory
 ```
+
+**Using it in crush**:
+
+- **`user-invocable: true`** — The skill is registered as a visible command in the `/` palette. Press `/` during a crush session to see `neuro-memory`.
+- **Slash command**: crush invokes the skill via the `/` palette + argument form, using the custom command in `crush/commands/neuro-memory.md` (supports `$SUBCMD` — e.g. `recent`, `query`, `status`, etc.).
+- **Auto mode (visible-but-minimal)**: crush is a no-plugin agent, so SKILL.md GATE 2 activates automatically — **bounded retrieval** (≤2 memories) before each response, and **background recording** after each turn (silent, no echo). The visible footprint is tiny; no large table dumps.
+- **opencode stays silent**: on opencode, auto retrieval & recording remain fully silent via the plugin (`opencode-neuro-memory-plugin/`) — completely unaffected.
 
 ### ✅ Verify Installation
 

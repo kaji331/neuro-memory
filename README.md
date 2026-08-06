@@ -79,7 +79,7 @@
 | **艾宾浩斯遗忘曲线** | 记忆随时间自然衰减；越常被"强化"的记忆留存越久（默认半衰期 24 小时） |
 | **5000 条硬上限** | 达到上限自动剪枝低相关度的旧记忆，保持记忆库永远"精炼" |
 
-> 🎁 **彩蛋：静默模式（默认开启）**。记忆的召回与存储全程在"后台"运行——由 opencode 插件（`plugin/`）静默处理，AI 不会在回复里透露出它查了记忆，也不会发起任何可见的工具调用。体验无缝而自然。想让它"亮出来"给你看？把配置里的 `display` 改成 `true` 即可。
+> 🎁 **彩蛋：静默模式（默认开启）**。记忆的召回与存储全程在"后台"运行——由 opencode 插件（`opencode-neuro-memory-plugin/`）静默处理，AI 不会在回复里透露出它查了记忆，也不会发起任何可见的工具调用。体验无缝而自然。想让它"亮出来"给你看？把配置里的 `display` 改成 `true` 即可。
 
 > 🔧 **Pi (π) 尽力而为方案**：Pi (oh-my-pi) **没有 turn-boundary hook**（无法检测每轮对话结束、无法在每轮开始前静默注入记忆上下文），因此 neuro-memory 在 Pi 上**不能做到 opencode 那样的全静默一体化体验**。但以下两种途径仍然有效：
 >
@@ -132,14 +132,14 @@ bun test
 ln -s "$(pwd)" ~/.agents/skills/neuro-memory
 ```
 
-**它怎么运作**：opencode 启动时会扫描 `~/.agents/skills/*/SKILL.md`，并把匹配的技能注入系统提示词。自动的"每次回应前查记忆、回应后记记忆"则由 **opencode 插件**（`plugin/`）静默完成——SKILL.md 只负责用户主动敲入的 `/neuro-memory` 显式命令。
+**它怎么运作**：opencode 启动时会扫描 `~/.agents/skills/*/SKILL.md`，并把匹配的技能注入系统提示词。自动的"每次回应前查记忆、回应后记记忆"则由 **opencode 插件**（`opencode-neuro-memory-plugin/`）静默完成——SKILL.md 只负责用户主动敲入的 `/neuro-memory` 显式命令。
 
-> 🔌 **启用静默插件（一次性）**：插件位于 `~/.agents/skills/neuro-memory/plugin/`（带 `package.json` + `server.ts`，`neuro-memory update` 已自动同步）。opencode 不会自动扫描 skill 目录里的 plugin，需要在全局 `~/.config/opencode/opencode.json` 的 `plugin` 数组加入插件**目录路径**：
+> 🔌 **启用静默插件（一次性）**：插件位于 `~/.agents/skills/neuro-memory/opencode-neuro-memory-plugin/`（带 `package.json` + `server.ts`，`neuro-memory update` 已自动同步）。opencode 不会自动扫描 skill 目录里的 plugin，需要在全局 `~/.config/opencode/opencode.json` 的 `plugin` 数组加入插件**目录路径**：
 >
 > ```json
 > {
 >   "plugin": [
->     "/home/kaji331/.agents/skills/neuro-memory/plugin"
+>     "/home/kaji331/.agents/skills/neuro-memory/opencode-neuro-memory-plugin"
 >   ]
 > }
 > ```
@@ -174,6 +174,13 @@ Crush 从 `~/.config/crush/skills/`（同样是符号链接农场）加载：
 mkdir -p ~/.config/crush/skills
 ln -s ~/.agents/skills/neuro-memory ~/.config/crush/skills/neuro-memory
 ```
+
+**如何在 crush 中使用**：
+
+- **`user-invocable: true`** — 该技能已注册为 `/` 面板中的可见命令。在 crush 对话中按 `/` 即可看到 `neuro-memory`。
+- **斜杠命令**：crush 通过 `/` 面板 + 参数形式调用，使用 `crush/commands/neuro-memory.md` 中的自定义命令（支持 `$SUBCMD`，如 `recent`、`query`、`status` 等）。
+- **自动模式（可见但极简）**：crush 属于无插件智能体，因此 SKILL.md 的 GATE 2 会自动生效——每次回应前进行 **有界召回**（最多 2 条记忆），回应后在**后台**静默记录（不显示）。可见开销极小，不会输出大表。
+- **opencode 保持静默**：在 opencode 中，自动召回与记录仍由插件（`opencode-neuro-memory-plugin/`）完全静默处理，不受影响。
 
 ### ✅ 验证安装
 
