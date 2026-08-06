@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { createRecordingHook, type RecordingOptions } from "../../plugin/recording";
+import { createRecordingHook, type RecordingOptions } from "../../opencode-neuro-memory-plugin/recording";
 
 function idleEvent(sessionID: string) {
   return {

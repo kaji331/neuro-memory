@@ -5,7 +5,7 @@ import { resolve } from "path";
 const root = resolve(import.meta.dir, "..");
 
 describe("neuro-memory scaffold", () => {
-  const requiredDirs = ["src", "scripts", "data", ".sisyphus/evidence", "test"];
+  const requiredDirs = ["src", "scripts", "data", "test"];
   const requiredFiles = ["package.json", "tsconfig.json", "SKILL.md", "src/index.ts"];
 
   for (const dir of requiredDirs) {

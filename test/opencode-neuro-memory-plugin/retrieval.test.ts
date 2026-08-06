@@ -10,8 +10,8 @@ import {
   formatMemoryLines,
   formatMemorySystemLines,
   deriveKeyword,
-} from "../../plugin/retrieval";
-import type { MemoryRow } from "../../plugin/retrieval";
+} from "../../opencode-neuro-memory-plugin/retrieval";
+import type { MemoryRow } from "../../opencode-neuro-memory-plugin/retrieval";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -125,7 +125,7 @@ retrieval:
 
     // We test deriveKeyword directly via its exposed helper.
     // The factory exports the pure function for testability.
-    const { deriveKeyword } = require("../../plugin/retrieval");
+    const { deriveKeyword } = require("../../opencode-neuro-memory-plugin/retrieval");
 
     it("extracts first meaningful word from a short message", () => {
       expect(deriveKeyword("Hello world")).toBe("hello");
@@ -546,7 +546,7 @@ retrieval:
   // Pure function: deriveKeyword edge cases
   // ───────────────────────────────────────────────────────────────────────────
   describe("deriveKeyword edge cases", () => {
-    const { deriveKeyword } = require("../../plugin/retrieval");
+    const { deriveKeyword } = require("../../opencode-neuro-memory-plugin/retrieval");
 
     it("handles multi-word input returning first contentful word", () => {
       expect(deriveKeyword("  what is the weather today")).toBe("weather");

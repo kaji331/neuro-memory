@@ -3,7 +3,7 @@ import { writeFileSync, unlinkSync, existsSync, mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
 import { tmpdir } from "os";
 
-import { loadPluginConfig } from "../../plugin/config";
+import { loadPluginConfig } from "../../opencode-neuro-memory-plugin/config";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 

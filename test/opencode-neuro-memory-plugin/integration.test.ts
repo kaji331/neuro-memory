@@ -64,7 +64,7 @@ describe("plugin — dbPath resolution", () => {
       "display: false\ndb:\n  memory_db_path: custom-memory.db\n",
     );
 
-    const { loadPluginConfig } = await import("../../plugin/config");
+    const { loadPluginConfig } = await import("../../opencode-neuro-memory-plugin/config");
     const cfg = loadPluginConfig(dir);
     expect(cfg.dbPath).toBeDefined();
     expect(typeof cfg.dbPath).toBe("string");
@@ -74,7 +74,7 @@ describe("plugin — dbPath resolution", () => {
 
   it("defaults dbPath when config omits db section", async () => {
     const dir = writeYaml(resolve(TMP_BASE, "no-db-config"), "display: false\n");
-    const { loadPluginConfig } = await import("../../plugin/config");
+    const { loadPluginConfig } = await import("../../opencode-neuro-memory-plugin/config");
     const cfg = loadPluginConfig(dir);
     expect(cfg.dbPath).toBeDefined();
     expect(cfg.dbPath).toContain("memory.db");
@@ -317,7 +317,7 @@ describe("plugin — hook assembly (wiring)", () => {
         resolve(TMP_BASE, "e2e-project"),
         "display: true\ndb:\n  memory_db_path: e2e-memory.db\n",
       );
-      const { loadPluginConfig } = await import("../../plugin/config");
+      const { loadPluginConfig } = await import("../../opencode-neuro-memory-plugin/config");
       const config = loadPluginConfig(dir);
 
       // 2. Recording hook would receive display/dbPath

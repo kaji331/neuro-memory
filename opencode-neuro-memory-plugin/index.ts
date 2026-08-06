@@ -3,7 +3,7 @@
  *
  * Enable in opencode.json: add the path to this plugin/ directory to the "plugin" array.
  * Example:
- *   { "plugin": ["/home/kaji331/.agents/skills/neuro-memory/plugin"] }
+ *   { "plugin": ["/home/kaji331/.agents/skills/neuro-memory/opencode-neuro-memory-plugin"] }
  *
  * The plugin directory contains a package.json whose default export (server.ts)
  * provides { id: "neuro-memory", server: neuroMemoryPlugin } — the format opencode

@@ -42,7 +42,7 @@ afterEach(() => {
 
 describe("plugin/server.ts module shape", () => {
   it("default export is an object with string `id` and callable `server`", async () => {
-    const mod = await import("../../plugin/server");
+    const mod = await import("../../opencode-neuro-memory-plugin/server");
     expect(typeof mod.default).toBe("object");
     expect(mod.default).not.toBeNull();
     expect(typeof mod.default.id).toBe("string");
@@ -51,13 +51,13 @@ describe("plugin/server.ts module shape", () => {
   });
 
   it("`id` matches the expected stable string 'neuro-memory'", async () => {
-    const mod = await import("../../plugin/server");
+    const mod = await import("../../opencode-neuro-memory-plugin/server");
     expect(mod.default.id).toBe("neuro-memory");
   });
 
   it("`server` is the same function as neuroMemoryPlugin from plugin/index", async () => {
-    const serverMod = await import("../../plugin/server");
-    const indexMod = await import("../../plugin/index");
+    const serverMod = await import("../../opencode-neuro-memory-plugin/server");
+    const indexMod = await import("../../opencode-neuro-memory-plugin/index");
     // serverMod.default.server should be the SAME reference as neuroMemoryPlugin (the default export of index.ts)
     expect(serverMod.default.server).toBe(indexMod.default);
     expect(serverMod.default.server).toBe(indexMod.neuroMemoryPlugin);
@@ -70,7 +70,7 @@ describe("plugin/server.ts module shape", () => {
 
 describe("plugin/server.ts server callability", () => {
   it("await server(ctxLike, undefined) returns a Hooks-like object", async () => {
-    const mod = await import("../../plugin/server");
+    const mod = await import("../../opencode-neuro-memory-plugin/server");
     const server = mod.default.server;
 
     const projectDir = writeYaml(resolve(TMP_BASE, "call-server"), "display: false\n");
@@ -92,7 +92,7 @@ describe("plugin/server.ts server callability", () => {
   });
 
   it("returned Hooks object has event key present", async () => {
-    const mod = await import("../../plugin/server");
+    const mod = await import("../../opencode-neuro-memory-plugin/server");
     const server = mod.default.server;
 
     const projectDir = writeYaml(resolve(TMP_BASE, "hooks-event"), "display: false\n");
@@ -114,7 +114,7 @@ describe("plugin/server.ts server callability", () => {
   });
 
   it("returned Hooks object has experimental.chat.system.transform present", async () => {
-    const mod = await import("../../plugin/server");
+    const mod = await import("../../opencode-neuro-memory-plugin/server");
     const server = mod.default.server;
 
     const projectDir = writeYaml(resolve(TMP_BASE, "hooks-system-transform"), "display: false\n");
@@ -148,7 +148,7 @@ describe("plugin/server.ts server callability", () => {
   });
 
   it("does NOT throw when called with a minimal valid PluginInput", async () => {
-    const mod = await import("../../plugin/server");
+    const mod = await import("../../opencode-neuro-memory-plugin/server");
     const server = mod.default.server;
 
     const projectDir = writeYaml(resolve(TMP_BASE, "no-throw"), "display: false\n");
@@ -182,12 +182,12 @@ describe("plugin/package.json", () => {
   it("exists at plugin/package.json", () => {
     const fs = require("fs") as typeof import("fs");
     const { resolve } = require("path") as typeof import("path");
-    expect(fs.existsSync(resolve(__dirname, "..", "..", "plugin", "package.json"))).toBe(true);
+    expect(fs.existsSync(resolve(__dirname, "..", "..", "opencode-neuro-memory-plugin", "package.json"))).toBe(true);
   });
 
   it("has required fields", () => {
     const { resolve } = require("path") as typeof import("path");
-    const pkg = require(resolve(__dirname, "..", "..", "plugin", "package.json"));
+    const pkg = require(resolve(__dirname, "..", "..", "opencode-neuro-memory-plugin", "package.json"));
     expect(pkg.name).toBe("neuro-memory-plugin");
     expect(pkg.private).toBe(true);
     expect(pkg.type).toBe("module");
@@ -196,7 +196,7 @@ describe("plugin/package.json", () => {
 
   it("has exports field with ./server entrypoint", () => {
     const { resolve } = require("path") as typeof import("path");
-    const pkg = require(resolve(__dirname, "..", "..", "plugin", "package.json"));
+    const pkg = require(resolve(__dirname, "..", "..", "opencode-neuro-memory-plugin", "package.json"));
     expect(pkg.exports).toBeDefined();
     expect(typeof pkg.exports).toBe("object");
     expect(pkg.exports["./server"]).toBe("./server.ts");

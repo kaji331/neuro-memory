@@ -12,6 +12,7 @@
     "neuro-memory.yaml",
     "src",
     "test",
+    "opencode-neuro-memory-plugin",
     "scripts",
     "tsconfig.json"
   ],
